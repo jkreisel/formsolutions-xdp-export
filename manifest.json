@@ -1,30 +1,37 @@
 {
-    "manifest_version": 2,
-  
-    "name": "Formsolutions → XDP Exporter",
-    "version": "0.1",
-    "description": "Liest Panels aus dem Formsolutions-Designer und erstellt eine XDP-Datei.",
-  
-    "permissions": [
-      "activeTab",
-      "downloads",
-      "storage"          
-    ],
-  
-    "background": {
-      "scripts": ["background.js"]      
-    },
-  
-    "browser_action": {                
-      "default_popup": "popup.html"
-    },
-  
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],      
-        "js": ["content.js"],
-        "run_at": "document_idle"
-      }
-    ]
+  "manifest_version": 2,
+  "name": "FormExporter",
+  "version": "1.0",
+  "description": "Extrahiere Panels aus Formsolutions und exportiere sie als XDP-Datei für FormCycle.",
+  "permissions": [
+    "storage",
+    "downloads",
+    "notifications",
+    "activeTab"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
   }
-  
+}

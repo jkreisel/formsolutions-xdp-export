@@ -18,20 +18,49 @@ function captureCurrentPanel() {
     Radiolist: 'radio',
     Fileupload: 'file',
     Compositecomponent: 'group',
+    Textoutput: 'textoutput'
   };
 
-  const elements = [...ROWS].map(row => {
-    const typeClass = [...row.querySelector("span.componentType").classList]
-      .find(c => map[c]) || 'staticText';
+  const elements = [];
 
+  const rowMap = new Map();
+
+  // 1. Elemente vorbereiten und zuordnen
+  [...ROWS].forEach(row => {
+    const idAttr = row.getAttribute('id');
+    const idParts = idAttr?.split('_') ?? [];
+    const depth = idParts.length - 1;
+    const baseId = idAttr?.split(':').pop();
+
+    const typeClass = [...row.querySelector("span.componentType")?.classList || []]
+      .find(c => map[c]);
+
+    const kind = map[typeClass] ?? "staticText";
     const labelNode = row.querySelector('span[style*="pointer-events"], span.highlightActivation');
     const id = (labelNode?.textContent.trim() || "unbenannt").replace(/\s+/g, "_");
 
-    return {
-      kind: map[typeClass] ?? "staticText",
-      id
-    };
+    const item = { kind, id };
+
+    rowMap.set(baseId, { item, depth, parentId: idAttr.includes('_') ? idAttr.split('_')[0] : null });
   });
+
+  // 2. Baumstruktur aufbauen
+  for (const [baseId, { item, depth, parentId }] of rowMap.entries()) {
+    if (item.kind === 'group') {
+      item.children = [];
+      elements.push(item);
+    } else if (parentId && rowMap.has(parentId)) {
+      const parentItem = rowMap.get(parentId).item;
+      if (parentItem.kind === 'group') {
+        parentItem.children = parentItem.children || [];
+        parentItem.children.push(item);
+      } else {
+        elements.push(item); // Fallback
+      }
+    } else {
+      elements.push(item);
+    }
+  }
 
   return { name, value, elements };
 }
